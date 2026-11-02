@@ -1,0 +1,10 @@
+node_modules
+.next/
+.capacity-runtime/
+*.tsbuildinfo
+.env*
+!.env.example
+results/
+inputs/
+*.log
+.DS_Store

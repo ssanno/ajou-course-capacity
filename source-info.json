@@ -1,0 +1,30 @@
+{
+  "application": "수강정원 플래너",
+  "sourceCommit": "6495c0bb9796e1d946ecc97b78c5d65d986c1727",
+  "modelVersion": "curriculum-v9-curriculum-compatible-history-2026-10-29",
+  "preparedOn": "2026-11-02",
+  "storage": "browser-local",
+  "runtime": "Node.js >=22.13.0",
+  "data": "Derived aggregate statistics and public curriculum snapshots; original uploaded files are not included.",
+  "engineFileHashes": {
+    "lib/course-catalog-data.ts": "0d9c2ad34fccef4f89e10cf93031663aebf9c4bb3f3faa5f03d8667698df8ca3",
+    "lib/course-compatibility.ts": "92c0d7690340adaed40cc0bb6c36dca848ce20fe7cb83138b36a1be119058745",
+    "lib/university-foundation-data.ts": "fd317cf1e909bcf41eac71f1a6ef4cb2b1b016b22478423eb2f2da7b0d306589",
+    "lib/university-foundation.ts": "e8dc8038f08c29f508c61d1893c5b63cb76e2317eb3a754e5d5194a268a5d111",
+    "lib/course-observation-data.ts": "c47708238b3699aa99aaa54970a4402e518b148ccfc09b480e2b30ce154e757f",
+    "lib/course-learning.ts": "c58b97f33b0aadbb468387c0cf0bdf948ede4097a726db7eab3f4b6863648652",
+    "lib/registration-data.ts": "aac7aadaea09a2ac71d2196d8517d5f73ba0a25f244ac925b0292752944d2443",
+    "lib/registration-profile.ts": "1a6fc0eb4b1c5529329824b869a4816b5b1007dbfa2a0f371622b8069553916b",
+    "lib/model.ts": "7d0171167473cf2e19ac5a5cca97ee492de5d0b6a11d8cbe5218ea1bbe200253",
+    "lib/planning.ts": "51156cc1746ff9313838f146e2e5294599e19179de547c8036d8288c7f10197b",
+    "lib/academic-policy.ts": "8700fad9851d8da0abc511fdc1364c44688ad21db032aef07445b6af6dbbfb7d",
+    "lib/official-offerings.ts": "3ae2a484e3d034777c8ce97becf94adcdaf3b0d077a268a02ad5f2a701124add",
+    "lib/school-curriculum.ts": "226370ff3692a3c71a8c762e97600f3cc8cc7366b9b894eff00885f54464fc67",
+    "lib/capacity-export.ts": "1f9d6ee85b6aa69963da4a0aa053d0ad2172636035dc69329b26c51e00655950"
+  },
+  "parityCheck": {
+    "courseTermCount": 217,
+    "expectedAndRecommendedMatch": true,
+    "referenceModel": "curriculum-v9-curriculum-compatible-history-2026-10-29"
+  }
+}

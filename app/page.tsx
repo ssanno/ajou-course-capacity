@@ -1,0 +1,27 @@
+'use client';
+import { useEffect,useRef,useState } from 'react';
+import { BookOpen,FolderOpen,Plus,Save } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription } from '@/components/ui/dialog';
+import { emptyPlan,planSchema,type Plan } from '@/lib/model';
+import {download} from '@/components/import-panel';
+import PlanningFlow from '@/components/planning-flow';
+import PredictionRecords from '@/components/prediction-records';
+import {listPlans,savePlan,clearDemoSession} from '@/lib/record-storage';
+import {isReviewDemo,isBrowserLocal} from '@/lib/site-mode';
+
+function newId(){const bytes=new Uint8Array(16);crypto.getRandomValues(bytes);return 'plan-'+Array.from(bytes,n=>n.toString(16).padStart(2,'0')).join('');}
+export default function Home(){
+ const [plan,setPlan]=useState<Plan>(()=>emptyPlan('새 계획','new-plan'));
+ const [saved,setSaved]=useState<Plan[]>([]),[open,setOpen]=useState(false),[busy,setBusy]=useState(false),[dirty,setDirty]=useState(false),[message,setMessage]=useState(''),[loading,setLoading]=useState(true);
+ const dirtyRef=useRef(false);dirtyRef.current=dirty;
+ async function load(){setLoading(true);try{setSaved(await listPlans());}catch{setMessage('저장 목록을 불러오지 못했습니다. 새 계획은 계속 작성할 수 있습니다.');}finally{setLoading(false);}}
+ useEffect(()=>{setPlan(p=>({...p,id:newId()}));void load();},[]);
+ useEffect(()=>{const leave=(e:BeforeUnloadEvent)=>{if(dirtyRef.current)e.preventDefault();};window.addEventListener('beforeunload',leave);return()=>window.removeEventListener('beforeunload',leave);},[]);
+ function change(p:Plan){setPlan(p);setDirty(true);setMessage('');}
+ function canLeave(){return !dirty||window.confirm('저장하지 않은 변경사항이 있습니다. 저장하지 않고 이동할까요?');}
+ async function save(){const parsed=planSchema.safeParse(plan);if(!parsed.success){setMessage(parsed.error.issues[0].message);return;}setBusy(true);try{const version=await savePlan(parsed.data);const next={...parsed.data,version};setPlan(next);setSaved(ps=>[next,...ps.filter(p=>p.id!==next.id)]);setDirty(false);setMessage(isReviewDemo()?'이 탭에 임시 저장했습니다. 장기 보관은 계획 파일을 다운로드하세요.':isBrowserLocal()?'이 브라우저에 저장했습니다.':'저장했습니다.');}catch(e){setMessage(e instanceof Error?e.message:'저장하지 못했습니다.');}finally{setBusy(false);}}
+ async function importPlan(file:File){try{if(file.size>2*1024*1024||!file.name.endsWith('.json'))throw Error('2MB 이내의 계획 JSON 파일을 선택해주세요.');const next=planSchema.parse(JSON.parse(await file.text()));if(!canLeave())return;setPlan({...next,id:newId(),version:0});setDirty(true);setOpen(false);setMessage('계획 파일을 불러왔습니다. 저장하면 다음에도 사용할 수 있습니다.');}catch(e){setMessage(e instanceof Error?e.message:'계획 파일을 읽지 못했습니다.');}}
+ function restore(p:Plan){if(!canLeave())return;const next=p.workflowVersion===2?p:{...p,workflowVersion:2 as const,studentCounts:[p.intake,...p.cohorts.slice(0,-1)],planningYear:p.targetYear,overrides:Object.fromEntries(Object.entries(p.overrides).map(([k,v])=>[k,{...v,enabled:false}]))};setPlan(next);setDirty(!p.workflowVersion);setOpen(false);setMessage('');}
+ return <div className="simple-app"><header className="simple-header"><div className="simple-brand"><BookOpen size={22}/><strong>수강정원 플래너</strong><span>{isReviewDemo()?'심사용 데모':'아주대학교'}</span></div><div className="simple-actions"><PredictionRecords disabled={busy}/><Button variant="ghost" disabled={busy} onClick={()=>{if(canLeave()){setPlan(emptyPlan('새 계획',newId()));setDirty(false);setMessage('');}}}><Plus/>새 계획</Button><Button variant="ghost" disabled={busy} onClick={()=>setOpen(true)}><FolderOpen/>불러오기</Button><Button disabled={busy||!dirty} onClick={()=>void save()}><Save/>{busy?'저장 중…':isReviewDemo()?'탭에 임시 저장':'저장'}</Button></div></header><main className="simple-main">{isBrowserLocal()&&<p className="input-note">입력 내용과 예측 기록은 이 브라우저에 저장됩니다. 다른 기기에서 사용하거나 별도 보관하려면 파일로 내려받으세요.</p>}{isReviewDemo()&&<div className="demo-notice"><div><strong>심사용 체험 공간</strong><p>직접 입력한 자료로 기능을 확인하세요. 입력과 예측 기록은 이 탭에만 임시 보관되며, 필요한 내용은 파일로 내려받으세요.</p></div><Button variant="ghost" onClick={()=>{if(window.confirm('이 탭의 입력·임시 저장 계획·예측 기록을 모두 비울까요? 필요한 파일을 먼저 다운로드하세요.')){clearDemoSession();setSaved([]);setPlan(emptyPlan('새 계획',newId()));setDirty(false);setMessage('데모 데이터를 비웠습니다.');}}}>데모 데이터 비우기</Button></div>}{message&&<div className="simple-message" role="status">{message}</div>}<PlanningFlow key={plan.id} plan={plan} disabled={busy} onChange={change}/></main><Dialog open={open} onOpenChange={setOpen}><DialogContent><DialogHeader><DialogTitle>{isReviewDemo()?'이 탭의 임시 계획':'저장된 계획'}</DialogTitle><DialogDescription>{isBrowserLocal()?"이 브라우저에 저장한 계획을 선택하세요. 브라우저 데이터를 삭제하면 저장 내용도 삭제됩니다.":"이어서 작성할 계획을 선택하세요."}</DialogDescription></DialogHeader><div className="saved-plans">{loading?<p>불러오는 중…</p>:saved.length?saved.map(p=><button key={p.id} onClick={()=>restore(p)}><strong>{p.name}</strong><span>{p.planningYear??p.targetYear}학년도{p.planningSemester?` ${p.planningSemester}학기`:''}</span></button>):<p>저장된 계획이 없습니다.</p>}</div><div className="plan-file-actions"><Button variant="outline" disabled={loading} onClick={()=>void load()}>목록 새로고침</Button><label className="upload-button">계획 파일 불러오기<input type="file" accept=".json" disabled={busy} onChange={e=>{if(e.target.files?.[0])void importPlan(e.target.files[0]);e.target.value='';}}/></label><Button variant="ghost" disabled={!plan.curriculum.length} onClick={()=>download(JSON.stringify(plan,null,2),`${plan.name}_계획.json`,'application/json;charset=utf-8')}>현재 계획 파일 저장</Button></div></DialogContent></Dialog></div>;
+}

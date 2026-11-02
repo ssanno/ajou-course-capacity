@@ -1,0 +1,4 @@
+interface:
+  display_name: "수강정원 산출"
+  short_description: "교육과정과 학년별 인원으로 과목별 권장정원을 산출합니다."
+  default_prompt: "이 저장소의 계산 프로그램으로 입력 자료를 검증하고 과목별 권장정원을 산출해 주세요."

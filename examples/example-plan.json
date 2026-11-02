@@ -1,0 +1,78 @@
+{
+  "id": "example-plan",
+  "name": "사용 예시(가상 학과)",
+  "baseYear": 2025,
+  "targetYear": 2026,
+  "curriculumYear": 2026,
+  "intake": 0,
+  "cohorts": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "rounding": 1,
+  "defaultLimit": 40,
+  "tolerance": 0,
+  "curriculum": [
+    {
+      "code": "EX-R1",
+      "name": "예시 전공필수",
+      "year": 2026,
+      "grade": 2,
+      "semester": 2,
+      "category": "전필",
+      "credits": 3,
+      "share": 1,
+      "note": ""
+    },
+    {
+      "code": "EX-R2",
+      "name": "예시 전공기초",
+      "year": 2026,
+      "grade": 2,
+      "semester": 2,
+      "category": "전공기초",
+      "credits": 3,
+      "share": 1,
+      "note": ""
+    },
+    {
+      "code": "EX-E1",
+      "name": "예시 전공선택",
+      "year": 2026,
+      "grade": 3,
+      "semester": 2,
+      "category": "전선",
+      "credits": 3,
+      "share": 1,
+      "note": ""
+    }
+  ],
+  "history": [],
+  "overrides": {
+    "2026:EX-R1:2": {
+      "sections": 2,
+      "enabled": true
+    },
+    "2026:EX-R2:2": {
+      "sections": 3,
+      "enabled": true
+    },
+    "2026:EX-E1:2": {
+      "sections": 1,
+      "enabled": true
+    }
+  },
+  "version": 0,
+  "workflowVersion": 2,
+  "studentCountBasis": "enrolled",
+  "studentCounts": [
+    70,
+    81,
+    90,
+    100
+  ],
+  "planningYear": 2026,
+  "planningSemester": 2
+}
